@@ -1,8 +1,11 @@
-# Funktion zum Lösen des Rätsels
-def solve_riddle(answer):
-    global solved
-    if answer.lower() == "bett":
-        print("Richtig! Der Durchgang öffnet sich.")
-        solved = True
+def solve_riddle(riddle):
+    print(riddle)
+    answer = input("Gib deine Antwort ein: ").strip().lower()
+    if answer == "feuer":
+        return True
     else:
-        print("Falsch. Versuche es nochmal.")
+        print("Das ist nicht richtig. Versuche es noch einmal.")
+        return False
+
+def end_game():
+    print("Danke fürs Spielen! Auf Wiedersehen!")
