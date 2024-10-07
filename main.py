@@ -1,86 +1,58 @@
-import game_utils
+from game_utils import solve_riddle, end_game
 
-print("Willkommen im adventuregame: Die verlorene Schatzsuche")
-name = input("Bitte gib deinen Namen ein: ")
-def greeting(name):
- print(f"Hallo, {name}!")
-greeting(name)
+def greeting():
+    print("Willkommen im Abenteuer-Spiel!")
+    print("Du wirst durch verschiedene Räume navigieren und Rätsel lösen müssen, um den Schatz zu finden.")
+    print("Gib 'norden', 'süden', 'osten' oder 'westen' ein, um dich zu bewegen.")
 
-import random
-
-# Räume und ihre Beschreibungen
-rooms = {
-    "Start": "Du befindest dich in einem dunklen Raum. Ein schwaches Licht dringt durch eine Spalte in der Tür.",
-    "Raum1": "Ein kleiner Raum mit einem Tisch und einem Buch darauf.",
-    "Schatzkammer": "Du hast die Schatzkammer erreicht! Ein glänzender Schatz liegt auf einem Podest."
-}
-
-# Gegenstände und ihre Beschreibungen
-items = {
-    "Buch": "Ein altes, verstaubtes Buch mit seltsamen Symbolen."
-}
-
-# Rätsel und Lösung
-riddle = "Was hat einen Kopf, aber keinen Körper, einen Fuß, aber keinen Schuh? Ein Bett."
-solved = False
-
-# Aktueller Raum und Inventar
-current_room = "Start"
-inventory = []
-
-# Funktion zum Anzeigen des aktuellen Raums und Inventars
-def look_around():
-    print(rooms[current_room])
-    if items in current_room:
-        print("Du siehst:", ", ".join(items))
-
-# Funktion zum Bewegen zwischen Räumen
-def move(direction):
-    global current_room
-    if direction == "Norden" and current_room == "Start":
-        current_room = "Raum1"
-        print("Du gehst nach Norden.")
-    elif direction == "Süden" and current_room == "Raum1":
-        current_room = "Start"
-        print("Du gehst nach Süden.")
-    elif direction == "Osten" and current_room == "Raum1" and solved:
-        current_room = "Schatzkammer"
-        print("Du gehst nach Osten und betrittst die Schatzkammer!")
-    else:
-        print("Du kannst in diese Richtung nicht gehen.")
-
-# Funktion zum Aufheben von Gegenständen
-def take(item):
-    global inventory
-    if item in rooms[current_room]:
-        inventory.append(item)
-        rooms[current_room].remove(item)
-        print(f"Du hast {item} aufgehoben.")
-    else:
-        print(f"Hier gibt es kein {item}.")
-
-
-# Spielschleife
-while True:
-    command = input("Was möchtest du tun?('gehe Norden', 'nimm Buch', 'loese Raetsel'): ").lower()
-    words = command.split()
+def enter_room(room):
+    descriptions = {
+        "start": "Du bist in einem dunklen Raum. Es gibt Türen nach Norden und Osten.",
+        "room_north": "Du bist in einem Raum mit alten Büchern. Es gibt Türen nach Süden und Osten.",
+        "room_east": "Du bist in einem geheimen Raum voller Goldmünzen. Der Schatz ist hier!",
+    }
+    print(descriptions[room])
     
+    actions = {
+        "start": ["norden", "osten"],
+        "room_north": ["süden", "osten"],
+        "room_east": []
+    }
+    
+    return actions[room]
 
-    if words[0] == "gehe":
-        move(words[1])
-    elif words[0] == "nimm":
-        take(words[1])
-    elif words[0] == "loese" and words[1] == "raetsel":
-        answer = input(riddle + " ")
-        solve_riddle(answer)
-    elif command == "beende":
-        break
-    else:
-        print("Befehl nicht erkannt.")
+def game_loop():
+    current_room = "start"
+    while True:
+        actions = enter_room(current_room)
+        if current_room == "room_east":
+            print("Herzlichen Glückwunsch! Du hast den Schatz gefunden!")
+            end_game()
+            break
+        
+        command = input("Was möchtest du tun? ").strip().lower()
+        
+        if command in actions:
+            if command == "norden":
+                current_room = "room_north"
+                riddle = "Ich bin nicht lebendig, aber ich wachse. Ich habe keine Lungen, aber ich brauche Luft. Was bin ich?"
+                if solve_riddle(riddle):
+                    print("Rätsel gelöst! Du darfst weitergehen.")
+            elif command == "osten":
+                if current_room == "start":
+                    current_room = "room_east"
+                else:
+                    print("Du kannst nicht nach Osten gehen.")
+            elif command == "süden":
+                if current_room == "room_north":
+                    current_room = "start"
+                else:
+                    print("Du kannst nicht nach Süden gehen.")
+            else:
+                print("Ungültiger Befehl.")
+        else:
+            print("Du kannst in diese Richtung nicht gehen.")
 
-    look_around()
-
-    if current_room == "Schatzkammer":
-        print("Herzlichen Glückwunsch! Du hast den Schatz gefunden!")
-        break
-
+if __name__ == "__main__":
+    greeting()
+    game_loop()
